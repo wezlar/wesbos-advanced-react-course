@@ -57,7 +57,7 @@ const Mutations = {
       info
     );
     // create the jwt token for them
-    const token = jwt.sign({ user: user.id }, process.env.APP_SECRET);
+    const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET);
     // we set the jwt as a cookie on the response
     ctx.response.cookie('token', token, {
         httpOnly: true,
@@ -65,6 +65,27 @@ const Mutations = {
     });
     // finally we return the user to the browser
     return user
+  },
+  async signin(parent, {email, password}, ctx, info) {
+    // 1. checkif there is a user with that email
+    const user = await ctx.db.query.user({ where: { email } });
+    if (!user) {
+      throw new Error(`No such user found for email ${email}`);
+    }
+    // 2. check if their password is correct
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) {
+      throw new Error(`Invalid password!`);
+    }
+    // 3. generate the jwt token
+    const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET);
+    // 4. set the cookie with the token
+    ctx.response.cookie('token', token, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 365,
+    });
+    // 5. return the user
+    return user;
   }
 }
 
