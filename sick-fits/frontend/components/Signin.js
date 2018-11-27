@@ -62,7 +62,7 @@ class Signin extends Component {
                   />
                 </label>
 
-                <button type="submit">Sign up!</button>
+                <button type="submit">Sign in!</button>
               </fieldset>
             </Form>
           )
