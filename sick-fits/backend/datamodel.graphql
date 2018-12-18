@@ -34,5 +34,5 @@ type CartItem {
   id: ID! @unique
   quantity: Int! @default(value: 1)
   item: Item # relatonship to item
-  user: User # relatonship to user
+  user: User! # relatonship to user
 }
