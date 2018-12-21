@@ -4,6 +4,7 @@ const { randomBytes } = require('crypto');
 const { promisify } = require('util');
 const { transport, makeANiceEmail } = require('../mail');
 const { hasPermission } = require('../utils');
+const stripe = require('../stripe');
 
 const Mutations = {
   async createItem(parent, args, ctx, info) {
@@ -279,7 +280,12 @@ const Mutations = {
       0
     );
     console.log(`going to chart the total of ${amount}`);
-    // 3. create the stripe charge
+    // 3. create the stripe charge (turn token into money)
+    const charge = await stripe.charges.create({
+      amount,
+      currency: 'GBP',
+      source: args.token,
+    });
     // 4. convert the cart items to order items
     // 5. create the order
     // 6. clean up - clear the users cart, delete cart items
